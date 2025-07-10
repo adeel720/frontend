@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuoteX Signal Bot</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 20px; background: #111; color: #fff; }
+    select, button { padding: 10px; font-size: 16px; margin: 5px; border-radius: 5px; }
+    #result { font-size: 24px; margin-top: 20px; font-weight: bold; }
+    .buy { color: #0f0; }
+    .sell { color: #f00; }
+  </style>
+</head>
+<body>
+  <h2>📈 QuoteX OTC + Live Signal Bot</h2>
+
+  <label for="pair">Select Pair:</label><br/>
+  <select id="pair">
+    <option value="EURUSD">EUR/USD</option>
+    <option value="USDJPY">USD/JPY</option>
+    <option value="GBPUSD">GBP/USD</option>
+    <option value="USDCHF">USD/CHF</option>
+    <option value="USDCAD">USD/CAD</option>
+    <option value="AUDUSD">AUD/USD</option>
+    <option value="NZDUSD">NZD/USD</option>
+    <option value="USD/BRL">USD/BRL OTC</option>
+    <option value="EUR/JPY">EUR/JPY OTC</option>
+    <option value="GBP/JPY">GBP/JPY OTC</option>
+    <option value="AUD/JPY">AUD/JPY OTC</option>
+    <option value="BTC/USD">BTC/USD</option>
+    <option value="ETH/USD">ETH/USD</option>
+  </select><br/>
+
+  <label for="timeframe">Timeframe:</label><br/>
+  <select id="timeframe">
+    <option value="5">5 Seconds</option>
+    <option value="10">10 Seconds</option>
+    <option value="15">15 Seconds</option>
+    <option value="30">30 Seconds</option>
+    <option value="60">1 Minute</option>
+  </select><br/>
+
+  <button onclick="analyzeMarket()">Analyze Market</button>
+
+  <div id="result">Waiting...</div>
+
+  <audio id="buySound" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3"></audio>
+  <audio id="sellSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+
+  <script>
+    async function analyzeMarket() {
+      const pair = document.getElementById("pair").value;
+      const timeframe = document.getElementById("timeframe").value;
+      const resultDiv = document.getElementById("result");
+      resultDiv.textContent = "Analyzing...";
+
+      try {
+  const response = await fetch("https://3000-adeel720-backend-r9fleuj0zva.ws-us120.gitpod.io/signal", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pair, timeframe })
+  });
+
+        const data = await response.json();
+        if (data.signal === "buy") {
+          resultDiv.textContent = "📈 BUY Signal!";
+          resultDiv.className = "buy";
+          document.getElementById("buySound").play();
+        } else if (data.signal === "sell") {
+          resultDiv.textContent = "📉 SELL Signal!";
+          resultDiv.className = "sell";
+          document.getElementById("sellSound").play();
+        } else {
+          resultDiv.textContent = "❓ No Clear Signal";
+          resultDiv.className = "";
+        }
+      } catch (err) {
+        resultDiv.textContent = "❌ Error fetching data";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
