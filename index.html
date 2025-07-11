@@ -51,33 +51,40 @@
   <audio id="sellSound" src="sell.mp3" preload="auto"></audio>
 
   <script>
-    // -----------------  1)  پیئرز لوڈ کرنا  -----------------
-    async function loadPairs(){
-      try{
-        const res=await fetch("https://3000-adeel720-backend-r9fleuj0zva.ws-us120.gitpod.io/api/pairs");
-        const data=await res.json();
-        const liveSel=document.getElementById("livePair");
-        const otcSel =document.getElementById("otcPair");
-        liveSel.innerHTML="<option value=''>-- Select Live Pair --</option>";
-        otcSel.innerHTML ="<option value=''>-- Select OTC Pair --</option>";
+    <script>
+  /* ایک ہی جگہ backend کا لنک لکھ دیں */
+  const BACKEND = "https://3000-adeel720-backend-r9fleuj0zva.ws-us120.gitpod.io";
 
-        data.pairs.forEach(pair=>{
-          const opt=document.createElement("option");
-          opt.value=pair;
-          opt.textContent=pair;
-          if(pair.includes("OTC")){
-            otcSel.appendChild(opt);
-          }else{
-            liveSel.appendChild(opt);
-          }
-        });
+  // -----------------  1)  پیئرز لوڈ کرنا  -----------------
+  async function loadPairs() {
+    try {
+      const res  = await fetch(`${BACKEND}/api/pairs`);
+      const data = await res.json();
 
-      }catch(err){
-        console.error("Pairs fetch error:",err);
-        document.getElementById("livePair").innerHTML="<option>Error loading</option>";
-        document.getElementById("otcPair").innerHTML ="<option>Error loading</option>";
-      }
+      const liveSel = document.getElementById("livePair");
+      const otcSel  = document.getElementById("otcPair");
+      liveSel.innerHTML = "<option value=''>-- Select Live Pair --</option>";
+      otcSel.innerHTML  = "<option value=''>-- Select OTC Pair --</option>";
+
+      data.pairs.forEach(pair => {
+        const opt = new Option(pair, pair);
+        if (pair.includes("OTC")) {
+          otcSel.appendChild(opt);
+        } else {
+          liveSel.appendChild(opt);
+        }
+      });
+    } catch (err) {
+      console.error("Pairs fetch error:", err);
+      document.getElementById("livePair").innerHTML = "<option>Error loading</option>";
+      document.getElementById("otcPair").innerHTML  = "<option>Error loading</option>";
     }
+  }
+
+  // صفحہ لوڈ ہوتے ہی کال کریں
+  window.onload = loadPairs;
+</script>
+
     // صفحہ لوڈ ہوتے ہی کال کریں
     loadPairs();
 
